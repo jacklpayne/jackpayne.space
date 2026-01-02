@@ -1,0 +1,10 @@
+body:not(.dark) {
+  --theme: #b49271;
+  --entry: #c08b56;
+  --primary: #4C000B;
+  --secondary: #1b1b1b;
+  --tertiary: #94a3b8;
+  --content: #0f172a;
+  --border: #4C000B;
+}
+
