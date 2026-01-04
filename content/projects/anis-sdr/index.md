@@ -8,7 +8,7 @@ math: true
 
 I wanted to familiarize myself with the GNURadio environment and creatively implement some adaptive filter ideas, so I chose to write a flexible custom C++ module for spike detection and removal. The filter can track and attenuate multiple interferers as they overlap and drift around the frequency spectrum. It works on complex basebands, so it can be used to recover modulated RF signals as well as real-valued signals like EEG data.
 
-Here is the [Github repo](https://github.com/jacklpayne) for the project if you'd like to explore it.
+Here is the [Github repo](https://github.com/jacklpayne/anis-sdr) for the project if you'd like to explore it.
 # architecture
 I decided on a cascaded IIR structure to get deep attenuation of multiple interference spikes. Wanting to get clever with the tracking, I drew inspiration from a family of adaptive filters that update themselves based on the derivatives of their own equations in order to do it completely in the time domain. Most of the legwork can be done without expensive Fourier transform operations this way.
 
@@ -34,13 +34,13 @@ So given a small step value $\omega_\triangle$, we update $$\omega \leftarrow \o
 Placing the notches at detected spikes and then letting them perform this computation per-sample is the essence of the filter.
 # some development notes
 ![](images/t1.png)
- At one prototype stage, the adaptive filter was able to track and settle on a single stationary interferer. However, the use of a slower (every 8 sample) update rate for $\omega$ produced spectral lines at $f_s/8$ intervals. I fixed this by simply updating $\omega$ per-sample with no significant performance penalty, but it was a good lesson learned about the consequences of introducing period behavior into a filter function. I also imposed an upper bound of $50 Hz$ on how much $\omega$ could move per update, since this also contributed to some sideband generation.
+ At one prototype stage, the adaptive filter was able to track and settle on a single stationary interferer. However, the use of a slower (every 8 sample) update rate for $\omega$ produced spectral lines at $f_s/8$ intervals. I fixed this by simply updating $\omega$ per-sample with no significant performance penalty, but it was a good lesson learned about the consequences of introducing periodic behavior into a filter function. I also imposed an upper bound of $50 Hz$ on how much $\omega$ could move per update, since this also contributed to some sideband generation.
 
 ![](images/t2.png)
 When multiple notches were implemented, sidebands also emerged despite smooth tracking. When I inspected the $\omega$ values for each notch, it seemed like dithering was being caused by very small oscillations of the notch frequency even when placed correctly in theory, contributing to both spurs and insufficient attenuation. Some approaches I tried:
 * Introducing a deadband (minimum $\omega_\triangle$) of 0.02 Hz required to update $\omega$. Larger update requests would still be made even if the the notch was placed correctly, so a minimal omega was not sufficient to predict meaningful updates.
 * I tried a latch mechanism where enough consecutive small requests (< about 10Hz) 'locks' the notch frequency, while enough consecutive larger requests (> 20Hz) 'unlocks' the notch and allows it to adapt meaningfully again. This introduced further issues -- notches were unmotivated to adapt at all even when playing with thresholds, often falsely converging by settling on non-ideal frequencies due to latch triggering when its gradient was small. While the notches were stationary enough to prevent spurs, this resulted in very poor attenuation.
-* I decided to try replacing the latch with a more elegant update smoother. This would use the gradient to persistently declare a target $\omega_\triangle$ and then continuously *slew* the update towards this value in order to prevent spectral lines emerging from discontinuously varying updates. By tuning the smoothing parameters, I achieved a maximum amplitude of -75dB for the interferers and sidebands in the worst (closest) case, and very successful attenuating when interferers were farther apart. 
+* I decided to try replacing the latch with a more elegant update smoother. This would use the gradient to persistently declare a target $\omega_\triangle$ and then continuously *slew* the update towards this value in order to prevent spectral lines emerging from discontinuously varying updates. By tuning the smoothing parameters, I achieved a maximum amplitude of -75dB for the interferers and sidebands in the worst (closest) case, and very successful attenuation when interferers were farther apart. 
 ![](images/t3.png)
 
 # results

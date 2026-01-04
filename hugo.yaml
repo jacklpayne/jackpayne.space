@@ -53,7 +53,7 @@ params:
     safari_pinned_tab: "/favicon-16x16.png"
 
   label:
-    text: "Home"
+    text: "jackpayne.space"
     icon: 
     iconHeight: 35
 
@@ -74,7 +74,7 @@ params:
 
   # home-info mode
   homeInfoParams:
-    Title: "hi i'm jack"
+    Title: "hi, i'm jack"
     Content: Computer Engineering senior at the University of Florida interested in signal processing, embedded systems, and electronic design. I’ve served as a lead and developed projects for the IEEE Signal Processing Society and the Audio Engineering Society.
 
   socialIcons:
@@ -82,6 +82,8 @@ params:
       url: "https://www.linkedin.com/in/jack-lpayne/"
     - name: github
       url: "https://github.com/jacklpayne"
+    - name: email
+      url: "mailto:thejackpayne@gmail.com"
 
   analytics:
     google:
