@@ -43,7 +43,7 @@ function step() {
 
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = "#4C000B";
+  ctx.fillStyle = "#ad8676";
   for (let y = 0; y < rows(); y++) {
     for (let x = 0; x < cols(); x++) {
       if (grid[y][x]) {

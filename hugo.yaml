@@ -54,8 +54,8 @@ params:
 
   label:
     text: "jackpayne.space"
-    icon: 
-    iconHeight: 35
+    icon: /favicon.ico
+    iconHeight: 24
 
   # profile-mode
   profileMode:
